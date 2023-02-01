@@ -4,23 +4,56 @@ using UnityEngine;
 
 public class RotateCamera : MonoBehaviour
 {
-    public Vector3 offset = new Vector3(0, 8.4f, -16.68f);
+    /// <summary>
+    /// Distance from the kart
+    /// </summary>
+    public Vector3 offset = new Vector3(0, 20f, -43f);
+
+    /// <summary>
+    /// Points at where the kart is
+    /// </summary>
     public Transform kartTarget;
 
-    private float cameraRotation;
+    /// <summary>
+    /// Rotation of camera around the Y axis
+    /// </summary>
+    private float cameraRotationX;
+
+    /// <summary>
+    /// How fast the camera should rotate
+    /// </summary>
     private float cameraRotationSpeed = 300f;
 
-    // Update is called once per frame
+    private void Awake()
+    {
+        kartTarget = GameObject.FindGameObjectWithTag("Kart").transform;
+    }
+
     void Update()
     {
-        cameraRotation += Input.GetAxisRaw("Mouse X") * cameraRotationSpeed * Time.deltaTime;  
+        // Update camera rotation when mouse input is received
+        cameraRotationX += Input.GetAxisRaw("Mouse X") * cameraRotationSpeed * Time.deltaTime;
     }
 
     private void LateUpdate()
     {
-        transform.position = kartTarget.position + offset;
-        transform.LookAt(kartTarget.position);
+        bool canRotateCamera = TryRotateCamera();
+    }
 
-        transform.RotateAround(kartTarget.position, Vector3.up, cameraRotation);
+    /// <summary>
+    /// Tries to rotate the camera if Kart is still in the scene;
+    /// </summary>
+    /// <returns></returns>
+    private bool TryRotateCamera()
+    {
+        bool canRotate = kartTarget != null;
+        if (canRotate)
+        {
+            transform.position = kartTarget.position + offset;
+            transform.LookAt(kartTarget.position);
+
+            transform.RotateAround(kartTarget.position, Vector3.up, cameraRotationX);
+        }
+        return canRotate;
     }
 }
